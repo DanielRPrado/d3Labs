@@ -1,7 +1,3 @@
-/*
-*    main.js
-*/
-
 const margin = { top: 100, right: 40, bottom: 70, left: 90 };
 const width = 800 - margin.left - margin.right;
 const height = 500 - margin.top - margin.bottom;
@@ -59,10 +55,18 @@ const yLabel = chart.append("text")
 d3.json("data/revenues.json").then(data => {
     data.forEach(d => {
         d.revenue = +d.revenue;
+        d.profit = +d.profit;
         d.month = d3.timeParse("%B")(d.month); // Convertir a objeto Date
     });
 
+    // Ordenar por mes
     data.sort((a, b) => a.month - b.month);
+
+
+    d3.interval(() => {
+        updateVisualization(data);
+        flag = !flag;
+    }, 2000);
 
     updateVisualization(data);
 
@@ -71,11 +75,14 @@ d3.json("data/revenues.json").then(data => {
 function updateVisualization(data) {
     var value = flag ? "revenue" : "profit";
 
-    xScale.domain(data.map(d => d3.timeFormat("%b")(d.month))); 
+    // Actualizar escalas
+    xScale.domain(data.map(d => d3.timeFormat("%b")(d.month))); // Formato abreviado
     yScale.domain([0, d3.max(data, d => d[value])]);
 
+    // Transiciones suaves
     const t = d3.transition().duration(750);
 
+    // Actualizar ejes
     xAxisGroup.transition(t)
         .call(d3.axisBottom(xScale))
         .selectAll("text")
@@ -89,6 +96,7 @@ function updateVisualization(data) {
             .ticks(5)
             .tickFormat(d => `$${d3.format(",.0f")(d)}`));
 
+    // Actualizar etiqueta Y
     yLabel.text(value === 'revenue' ? "Revenues (USD)" : "Profits (USD)");
 
     // JOIN
@@ -108,7 +116,7 @@ function updateVisualization(data) {
         .attr("width", xScale.bandwidth())
         .attr("y", d => yScale(d[value]))
         .attr("height", d => height - yScale(d[value]))
-        .attr("fill", );
+        .attr("fill", colorScale(value));
 
     // ENTER
     bars.enter()
@@ -118,7 +126,7 @@ function updateVisualization(data) {
             .attr("width", xScale.bandwidth())
             .attr("y", height)
             .attr("height", 0)
-            .attr("fill", "red")
+            .attr("fill", colorScale(value))
         .transition(t)
             .attr("y", d => yScale(d[value]))
             .attr("height", d => height - yScale(d[value]));

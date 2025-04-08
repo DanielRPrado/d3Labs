@@ -28,11 +28,6 @@ d3.json("data/buildings.json")
       .domain([0, 828])
       .range([height, 0]);  // Flipped range
 
-    // Color Scale
-    var color = d3.scaleOrdinal()
-      .domain(data.map(d => d.name))
-      .range(d3.schemeSet3);
-
     // Axes
     var xAxisCall = d3.axisBottom(x)
       .tickSizeOuter(0);
@@ -61,7 +56,7 @@ d3.json("data/buildings.json")
     g.append("text")
       .attr("class", "x-axis-label")
       .attr("x", width / 2)
-      .attr("y", height + 95) 
+      .attr("y", height + 100) 
       .attr("text-anchor", "middle")
       .text("The world's tallest buildings");
 
@@ -80,10 +75,10 @@ d3.json("data/buildings.json")
       .enter()
       .append("rect")
       .attr("x", d => x(d.name))
-      .attr("y", d => y(d.height))  // Start at scaled height
+      .attr("y", d => y(d.height)) 
       .attr("width", x.bandwidth())
-      .attr("height", d => height - y(d.height))  // Extend to bottom
-      .attr("fill", d => color(d.name))
+      .attr("height", d => height - y(d.height))  
+      .attr("fill", "grey")
       .attr("stroke", "#2c3e50");
   })
   .catch(error => {
