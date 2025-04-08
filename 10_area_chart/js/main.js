@@ -26,6 +26,10 @@ var yAxisCall = d3.axisLeft();
 
 // Area generator
 // TODO create the area generator
+var area = d3.area()
+        .x(d => x(d.date))
+        .y0(y(0))
+        .y1(d => y(d.close));
 
 // Axis groups
 var xAxis = g.append("g")
@@ -60,6 +64,11 @@ d3.tsv("data/area.tsv").then((data) => {
 
     // Add area chart
     // TODO add the area path to the visualization
+    g.append("path")
+        .datum(data)
+        .attr("class", "area")
+        .attr("fill", "#69b3a2")
+        .attr("d", area);
    
 }).catch((error) => {
     console.log(error);
